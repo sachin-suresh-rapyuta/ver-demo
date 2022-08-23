@@ -1,0 +1,910 @@
+openapi: 3.0.0
+info:
+  title: Rapyuta Robotics PA-AMR API
+  version: '1.0'
+  contact:
+    name: Chen Weiss
+    email: chen.weiss@rapyuta-robotics.com
+  description: API that allows integration with Rapyuta Robotics' proprietary PA-AMR solution.
+servers:
+  - url: 'http://localhost:8080'
+    description: Local
+paths:
+  /v1/documents/upload:
+    post:
+      summary: Upload Documents
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/longrunning-operation-v1'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Errors related to the input provided by the user.
+                    readOnly: true
+              examples:
+                Invalid document kind:
+                  value:
+                    error: '''PRODUCT'' is not a valid Document.Kind'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '403':
+          $ref: '#/components/responses/forbidden'
+      operationId: post-documents-bulk-upload-v1
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                document:
+                  format: binary
+                  type: string
+                  description: A binary file containing records in CSV format.
+                kind:
+                  $ref: '#/components/schemas/document-kind-v1'
+              required:
+                - document
+                - kind
+        description: ''
+      description: Creates a document from an uploaded CSV file. The schema of the CSV file is predetermined according to the vendor.
+      parameters: []
+      tags:
+        - Documents
+    parameters: []
+  /v1/events:
+    get:
+      summary: Retrieve Events
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/paginated-list-v1'
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/event-v1'
+              examples: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  start_time:
+                    type: array
+                    description: Errors related to the timestamp provided in `start_time_before` or `start_time_after`.
+                    items:
+                      type: string
+                    readOnly: true
+                  end_time:
+                    type: array
+                    description: Errors related to the timestamp provided in `end_time_before` or `end_time_after`.
+                    items:
+                      type: string
+                    readOnly: true
+                  id:
+                    type: array
+                    description: Errors related to the input provided in `id`.
+                    items:
+                      type: string
+              examples:
+                Invalid timestamp provided:
+                  value:
+                    created:
+                      - Enter a valid date/time.
+                Invalid ID provided:
+                  value:
+                    id:
+                      - Enter a valid UUID.
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '403':
+          $ref: '#/components/responses/forbidden'
+      operationId: get-events-v1
+      description: Retrieves a list of events.
+      parameters:
+        - schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/event-kind-v1'
+            uniqueItems: true
+          in: query
+          name: kind
+          description: The event kind.
+          style: form
+        - schema:
+            type: string
+            format: date-time
+          in: query
+          name: created_after
+          description: Creation timestamp lower bound (inclusive)
+        - schema:
+            type: string
+            format: date-time
+          in: query
+          name: created_before
+          description: Creation timestamp upper bound (inclusive)
+        - schema:
+            type: array
+            items:
+              type: string
+          in: query
+          name: order_id
+          description: The order unique identifier.
+          explode: true
+        - schema:
+            type: array
+            format: uuid
+          in: query
+          name: id
+          description: The event unique identifier.
+      tags:
+        - Events
+    post:
+      summary: Create Event
+      operationId: post-v1-events
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/event-v1'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/event-v1'
+      description: Create a new event.
+      tags:
+        - Events
+  /v1/operations:
+    get:
+      summary: Retrieve Operations
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/paginated-list-v1'
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/longrunning-operation-v1'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  start_time:
+                    type: array
+                    description: Errors related to the timestamp provided in `start_time_before` or `start_time_after`.
+                    items:
+                      type: string
+                    readOnly: true
+                  end_time:
+                    type: array
+                    description: Errors related to the timestamp provided in `end_time_before` or `end_time_after`.
+                    items:
+                      type: string
+                    readOnly: true
+                  id:
+                    type: array
+                    description: Errors related to the input provided in `id`.
+                    items:
+                      type: string
+              examples:
+                Invalid timestamp provided:
+                  value:
+                    created:
+                      - Enter a valid date/time.
+                Invalid ID provided:
+                  value:
+                    id:
+                      - Enter a valid UUID.
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '403':
+          $ref: '#/components/responses/forbidden'
+      operationId: get-operations-v1
+      description: Retrieves many long-running operations.
+      parameters:
+        - schema:
+            type: string
+            format: date-time
+          in: query
+          name: start_time_after
+          description: Start timestamp lower bound (inclusive)
+        - schema:
+            type: string
+            format: date-time
+          in: query
+          name: start_time_before
+          description: Start timestamp upper bound (inclusive)
+        - schema:
+            type: string
+            format: date-time
+          in: query
+          name: end_time_after
+          description: End timestamp lower bound (inclusive)
+        - schema:
+            type: string
+            format: date-time
+          in: query
+          name: end_time_before
+          description: End timestamp upper bound (inclusive)
+        - schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - DONE
+                - PENDING
+                - RUNNING
+            uniqueItems: true
+          in: query
+          name: status
+          description: The operation's current status.
+          style: form
+        - schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+            uniqueItems: true
+          in: query
+          name: id
+          description: The operation unique identifier.
+          style: form
+          explode: true
+        - schema:
+            type: array
+            items:
+              type: string
+          in: query
+          name: name
+          description: The operation name.
+      tags:
+        - Operations
+    parameters: []
+  '/v1/operations/{operationId}':
+    parameters:
+      - schema:
+          type: string
+        name: operationId
+        in: path
+        required: true
+    get:
+      summary: Retrieve Operation
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/longrunning-operation-v1'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '404':
+          description: Not Found
+      operationId: get-operation-v1
+      description: Retrieves one long-running operation.
+      tags:
+        - Operations
+components:
+  schemas:
+    document-kind-v1:
+      type: string
+      title: Document Kind
+      description: The kind of records contained in the document.
+      enum:
+        - PICKING_ORDERS
+        - PRODUCTS
+        - TOTE_TYPES
+        - TOTES
+    error-pick-v1:
+      type: string
+      title: Pick Error
+      enum:
+        - ITEM_MISSING_DAMAGED
+        - ITEM_OVERSIZED
+        - TOTE_OVERFLOW
+        - TOTE_NOT_FOUND
+        - PRINT_FAILED
+        - SYSTEM_EXCEPTION
+        - OTHER
+      description: Error that occurred while performing the pick.
+    event-v1:
+      title: Event
+      type: object
+      description: Represents an event that occurred during warehouse operations.
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the event.
+          readOnly: true
+        kind:
+          $ref: '#/components/schemas/event-kind-v1'
+        order_id:
+          type: string
+          description: Unique identifier of the order.
+          readOnly: true
+        data:
+          description: Data related to the event.
+          oneOf:
+            - $ref: '#/components/schemas/event-data-order-state-v1'
+            - $ref: '#/components/schemas/event-data-pick-v1'
+            - $ref: '#/components/schemas/event-data-tote-assignment-v1'
+            - $ref: '#/components/schemas/event-data-tote-label-v1'
+            - $ref: '#/components/schemas/event-data-tote-loading-v1'
+            - $ref: '#/components/schemas/event-data-tote-split-v1'
+            - $ref: '#/components/schemas/event-data-tote-unloading-v1'
+        created:
+          type: string
+          format: date-time
+          description: Timestamp of when the event was created.
+          readOnly: true
+      required:
+        - kind
+        - order_id
+        - data
+    event-kind-v1:
+      type: string
+      title: Event Kind
+      description: The event kind.
+      enum:
+        - 'PICKING::ORDER_STATE'
+        - 'PICKING::PICK'
+        - 'PICKING::TOTE_ASSIGNMENT'
+        - 'PICKING::TOTE_LABEL'
+        - 'PICKING::TOTE_LOADING'
+        - 'PICKING::TOTE_SPLIT'
+        - 'PICKING::TOTE_UNLOADING'
+    event-data-order-state-v1:
+      title: Order State Event Data
+      type: object
+      description: |-
+        Data of an order state event.
+        This event is fired every time an order is transitioning from one state to another.
+      examples:
+        - prev_state: null
+          state: NEW
+        - prev_state: ACCEPTED
+          state: IN_PROGRESS
+      properties:
+        prev_state:
+          $ref: '#/components/schemas/order-state-v1'
+        state:
+          $ref: '#/components/schemas/order-state-v1'
+        is_manual:
+          type: boolean
+          description: 'If true, indicates that the order was marked as a manual one.'
+        rejections:
+          type: array
+          description: 'If present, includes rejected order line IDs with their respective rejection reasons. Will only be present if the order''s state is `REJECTED`.'
+          items:
+            type: object
+            properties:
+              order_line_id:
+                type: string
+                description: The order line unique identifier.
+              reason:
+                type: string
+                description: The rejection reason.
+      required:
+        - state
+        - is_manual
+    event-data-pick-v1:
+      title: Pick Event Data
+      type: object
+      description: |-
+        Data of a pick event.
+        This event is fired after an item is placed inside the tote. If any error has occurred while picking the item, it will be specified in the `error` proprety.
+      properties:
+        order_line_id:
+          type: string
+          description: Unique identifier of the order line.
+        user_id:
+          type: string
+          description: Unique identifier of the user that performed the pick.
+        quantity_assigned:
+          type: integer
+          description: Total quantity of product that was assigned for this tote assignment.
+          minimum: 0
+        quantity_picked:
+          type: integer
+          description: Quantity of product that was successfully picked.
+          minimum: 0
+        barcode:
+          type: string
+          maxLength: 55
+          description: Barcode used for the products that were picked.
+        error:
+          $ref: '#/components/schemas/error-pick-v1'
+      required:
+        - order_line_id
+        - quantity_assigned
+        - quantity_picked
+        - barcode
+    event-data-tote-assignment-v1:
+      title: Tote Assignment Event Data
+      type: object
+      description: |-
+        Data of a tote assignment event.
+        This event is fired after an agent starts processing a tote.
+      properties:
+        tote_task_id:
+          type: integer
+          description: Unique identifier of the tote task assignment.
+          readOnly: true
+      required:
+        - tote_task_id
+    event-data-tote-label-v1:
+      title: Tote Label Event Data
+      type: object
+      description: |-
+        Data of a tote label event.
+        This event is fired when a request to print a tote label is received from the AMRs.
+      properties:
+        agent_id:
+          type: string
+          description: Unique identifier of the agent (AMR) that will perform the pick.
+        tote_task_id:
+          type: integer
+          description: Unique identifier of the tote task assignment.
+          format: int64
+          minimum: 0
+        token_id:
+          type:
+            - string
+            - 'null'
+          description: A logical shorter identifier for an order. Binds tote information to an order.
+        spot:
+          type: string
+          description: Name of the loading spot.
+        tote_id:
+          type: string
+          description: Unique identifier of the physical tote. Only present in cases where the label is issued after the tote is loaded.
+        tote_type:
+          type: string
+          description: The tote type.
+        tote_split_index:
+          type: integer
+          description: Index of this tote assignment out of the total number of tote assignments.
+          minimum: 1
+        tote_split_total:
+          type: integer
+          description: Total number of tote assignments for the order.
+          minimum: 1
+        additional_properties:
+          type: array
+          description: Additional properties that was supplied during the order's registration.
+          items:
+            type: object
+            minProperties: 0
+        is_reissuance:
+          type: boolean
+          description: Indicates whether this label is a reissuance of a previously issued one.
+      required:
+        - agent_id
+        - tote_task_id
+        - token_id
+        - spot
+        - tote_type
+        - tote_split_index
+        - tote_split_total
+        - additional_properties
+        - is_reissuance
+    event-data-tote-loading-v1:
+      title: Tote Loading Event Data
+      type: object
+      description: |-
+        Data of a tote loading event.
+        This event is fired after a tote is loaded onto a tray on the AMR.
+      properties:
+        spot:
+          type: string
+          description: Name of the loading spot.
+        tote_id:
+          type: string
+          description: Unique identifier of the physical tote.
+        tote_type:
+          type: string
+          description: The tote type.
+        tote_split_index:
+          type: integer
+          description: Index of this tote assignment out of the total number of tote assignments.
+          minimum: 1
+        tote_split_total:
+          type: integer
+          description: Total number of tote assignments.
+          minimum: 1
+        order_lines:
+          type: array
+          description: Order lines that are included in the tote assignment.
+          items:
+            type: object
+            properties:
+              order_line_id:
+                type: string
+                description: Unique identifier of the order line.
+              quantity_requested:
+                type: integer
+                description: Total quantity of product that was requested for this order line.
+                minimum: 0
+              quantity_assigned:
+                type: integer
+                minimum: 0
+                description: Total quantity of product that was assigned to the tote.
+            required:
+              - order_line_id
+              - quantity_requested
+              - quantity_assigned
+      required:
+        - spot
+        - tote_id
+        - tote_type
+        - tote_split_index
+        - tote_split_total
+        - order_lines
+    event-data-tote-split-v1:
+      title: Tote Split Event Data
+      type: object
+      description: |-
+        Data of a tote split event.
+        This event is fired after an order is split into totes.
+      properties:
+        totes:
+          type: array
+          items:
+            type: object
+            properties:
+              tote_task_id:
+                type: integer
+                description: Unique identifier of the tote task assignment.
+                format: int64
+              token_id:
+                type:
+                  - string
+                  - 'null'
+                description: A logical shorter identifier for an order. Binds tote information to an order.
+                readOnly: true
+              tote_type:
+                type: string
+                description: The tote type.
+                readOnly: true
+              split_index:
+                type: integer
+                minimum: 0
+                description: Index of this tote assignment out of the total number of tote assignments.
+                readOnly: true
+              split_total:
+                type: integer
+                minimum: 0
+                description: Total number of tote assignments for the order.
+                readOnly: true
+            required:
+              - tote_task_id
+              - token_id
+              - tote_type
+              - split_index
+              - split_total
+          readOnly: true
+      required:
+        - totes
+    event-data-tote-unloading-v1:
+      title: Tote Unloading Event Data
+      type: object
+      description: |-
+        Data of a tote unloading event.
+        This event is fired after a tote is unloaded from a tray on the AMR.
+      properties:
+        spot:
+          type: string
+          description: Name of the unloading spot.
+        tote_id:
+          type: string
+          description: Unique identifier of the physical tote.
+        tote_type:
+          type: string
+          description: The tote type.
+        tote_split_index:
+          type: integer
+          description: Index of this tote assignment out of the total number of tote assignments.
+          minimum: 1
+        tote_split_total:
+          type: integer
+          description: Total number of tote assignments.
+          minimum: 1
+        order_lines:
+          type: array
+          description: Order lines that are included in the tote assignment.
+          items:
+            type: object
+            properties:
+              order_line_id:
+                type: string
+                description: Unique identifier of the order line.
+              quantity_requested:
+                type: integer
+                description: Total quantity of product that was requested for this order line.
+                minimum: 0
+              quantity_assigned:
+                type: integer
+                minimum: 0
+                description: Total quantity of product that was assigned to the tote.
+              quantity_picked:
+                type: integer
+                description: Quantity of product that was successfully picked.
+                minimum: 0
+              error:
+                $ref: '#/components/schemas/error-pick-v1'
+            required:
+              - order_line_id
+              - quantity_requested
+              - quantity_assigned
+              - quantity_picked
+      required:
+        - tote_id
+        - tote_type
+        - tote_split_index
+        - tote_split_total
+        - order_lines
+    longrunning-error-v1:
+      title: Operation Error
+      type: object
+      description: Describes an error that occurred during the run of a background operation.
+      properties:
+        '@type':
+          type: string
+          maxLength: 32
+          description: Type of the raised error.
+          readOnly: true
+    longrunning-error-internal-v1:
+      allOf:
+        - $ref: '#/components/schemas/longrunning-error-v1'
+        - type: object
+          description: A validation error that was raised while processing a document.
+          properties:
+            reason:
+              type: string
+              description: String representation of the error.
+              readOnly: true
+            dump:
+              type: string
+              description: Internal representation of the error.
+              readOnly: true
+          required:
+            - reason
+            - dump
+      description: Internal error that was raised while processing a document.
+      title: Internal Error
+      examples:
+        - dump: '{"pool": {"source_address": null, "socket_options": [[6, 1, 1]], "proxy": null, "proxy_config": null, "timeout": null, "blocksize": 8192, "sock": null, "_buffer": [], "_HTTPConnection__response": null, "_HTTPConnection__state": "Idle", "_method": null, "_tunnel_host": null, "_tunnel_port": null, "_tunnel_headers": {}, "_dns_host": "ims", "port": 8002, "_create_connection": null, "key_file": null, "cert_file": null, "key_password": null, "ssl_context": null, "server_hostname": null, "_protocol": "https", "cert_reqs": {"py/newargs": [2], "_value_": 2, "_name_": "CERT_REQUIRED", "__objclass__": {"py/type": "ssl.VerifyMode"}}, "assert_hostname": null, "assert_fingerprint": null, "ca_certs": null, "ca_cert_dir": null, "ca_cert_data": null, "ssl_version": null}}'
+          '@type': NewConnectionError
+          reason: '<urllib3.connection.HTTPSConnection object at 0x7f74f279bd00>: Failed to establish a new connection: [Errno 111] Connection refused'
+    longrunning-error-processing-v1:
+      allOf:
+        - $ref: '#/components/schemas/longrunning-error-v1'
+        - type: object
+          properties:
+            code:
+              type: string
+              description: The error code.
+              readOnly: true
+            description:
+              type: string
+              description: Description of the error.
+              readOnly: true
+          required:
+            - code
+            - description
+      description: Pipeline error that was raised while processing the document.
+      title: Processing Error
+      examples:
+        - code: task-error
+          '@type': PipelineError
+          description: 'The task has an error: [step-error] Step is not valid: "fields_rename" raises "[schema-error] Schema is not valid: field "id_display" does not exist"'
+    longrunning-error-row-violation-v1:
+      allOf:
+        - $ref: '#/components/schemas/longrunning-error-v1'
+        - type: object
+          properties:
+            row:
+              type: string
+              description: Row number in the document.
+              readOnly: true
+            field:
+              type: string
+              description: Field name in the document.
+              readOnly: true
+            description:
+              type: string
+              description: Description of the error.
+              readOnly: true
+          required:
+            - row
+            - field
+            - description
+      description: Validation error that was raised while processing a document.
+      title: Row Violation Error
+      examples:
+        - row: 3
+          '@type': RowViolationsError
+          field: dimensions_h
+          description: 'Type error in the cell "not_a_number" in row "3" and field "dimensions_h" at position "10": type is "number/default"'
+    longrunning-operation-v1:
+      title: Long-running Operation
+      type: object
+      description: Represents a background process that would result in the creation or update of one or more other resources.
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the operation.
+          readOnly: true
+        name:
+          type: string
+          maxLength: 256
+          description: A descriptive name of the operation.
+          readOnly: true
+        start_time:
+          type: string
+          format: date-time
+          description: Timestamp of when the operation was started.
+          readOnly: true
+        end_time:
+          type: string
+          format: date-time
+          description: Timestamp of when the operation was ended.
+          readOnly: true
+        state:
+          type: string
+          enum:
+            - PENDING
+            - RUNNING
+            - DONE
+          description: State of the operation.
+          readOnly: true
+        errors:
+          description: List of errors that were raised while running the operation.
+          type: array
+          items:
+            anyOf:
+              - $ref: '#/components/schemas/longrunning-error-internal-v1'
+              - $ref: '#/components/schemas/longrunning-error-processing-v1'
+              - $ref: '#/components/schemas/longrunning-error-row-violation-v1'
+        created:
+          type: string
+          format: date-time
+          description: Timestamp of when the operation was created.
+          readOnly: true
+        target:
+          type: object
+          description: The operation target resource.
+          properties:
+            id:
+              type: string
+              format: uuid
+              description: The target resource unique identifier.
+              readOnly: true
+            kind:
+              type: string
+              enum:
+                - document
+              description: The target resource kind.
+              readOnly: true
+      required:
+        - id
+        - name
+        - state
+        - created
+    order-state-v1:
+      type: string
+      title: Order State
+      description: An order state.
+      enum:
+        - ABORTED
+        - ACCEPTED
+        - CANCELLED
+        - COMPLETED
+        - IN_PROGRESS
+        - NEW
+        - ON_HOLD
+        - PARTIALLY_COMPLETED
+        - REJECTED
+    paginated-list-v1:
+      title: Paginated List
+      type: object
+      properties:
+        next:
+          type:
+            - string
+            - 'null'
+          description: 'If not `null`, absolute URL pointing to the next page of results.'
+          format: uri
+        previous:
+          type:
+            - string
+            - 'null'
+          format: uri
+          description: 'If not `null`, absolute URL pointing to the previous page of results.'
+      description: Properties in a paginated list of results.
+  responses:
+    unauthorized:
+      description: Returned if the request did not contain credentials or the provided credentials were rejected.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              detail:
+                type: string
+                description: Details of the authentication error.
+                readOnly: true
+            required:
+              - detail
+          examples:
+            No credentials:
+              value:
+                detail: Authentication credentials were not provided.
+            Invalid API token:
+              value:
+                detail: Invalid token.
+    forbidden:
+      description: Returned when the user making the request did not have sufficient permissions to access the resource.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              detail:
+                type: string
+                description: Details of the authorization error.
+                readOnly: true
+            required:
+              - detail
+          examples:
+            Insufficient credentials:
+              value:
+                detail: You do not have permission to perform this action.
+  parameters: {}
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Token
+      description: Opaque API access token.
+security:
+  - BearerAuth: []
+tags:
+  - name: Documents
+  - name: Events
+  - name: Operations
