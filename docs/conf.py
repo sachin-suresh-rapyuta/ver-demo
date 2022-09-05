@@ -6,8 +6,6 @@ project = 'Lumache'
 copyright = '2021, Graziella'
 author = 'Graziella'
 
-release = '0.1'
-version = '0.1.0'
 
 # -- General configuration
 
@@ -35,6 +33,15 @@ html_theme = 'sphinx_rtd_theme'
 # -- Options for EPUB output
 epub_show_urls = 'footnote'
 
+#Open API Spec to render APIs
+#redoc = [
+#    {
+#        'name': 'Batcomputer API',
+#        'page': 'index',
+#        'spec': 'specs/openapi.yaml',
+#        'embed': True,
+#    }
+#]
 
 # -- Extension configuration -------------------------------------------------
 
@@ -52,8 +59,3 @@ version = '6.16.1-dev'
 
 # The full version, including alpha/beta/rc tags.
 release = version
-
-html_theme_options = {
-    'logo_only': False,
-    'display_version': True
-}
