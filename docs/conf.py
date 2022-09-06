@@ -63,3 +63,7 @@ version = '6.16.1-dev'
 
 # The full version, including alpha/beta/rc tags.
 release = version
+
+
+locale_dirs = ['locale/']   # path is example but recommended.
+gettext_compact = False     # optional.
