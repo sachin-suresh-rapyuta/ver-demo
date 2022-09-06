@@ -19,27 +19,21 @@ msgstr ""
 
 #: ../../index.rst:2
 msgid "Welcome to Lumache's documentation!"
-msgstr ""
+msgstr "Lumache のドキュメントへようこそ!"
 
 #: ../../index.rst:4
-msgid ""
-"**Lumache** (/lu'make/) is a Python library for cooks and food lovers "
-"that creates recipes mixing random ingredients. It pulls data from the "
-"`Open Food Facts database <https://world.openfoodfacts.org/>`_ and offers"
-" a *simple* and *intuitive* API."
-msgstr ""
+msgid "**Lumache** (/lu'make/) is a Python library for cooks and food lovers that creates recipes mixing random ingredients. It pulls data from the `Open Food Facts database <https://world.openfoodfacts.org/>`_ and offers a *simple* and *intuitive* API."
+msgstr "**Lumache** (/lu'make/) は、ランダムな材料を組み合わせてレシピを作成する、料理人や料理愛好家向けの Python ライブラリです。 `Open Food Facts データベース <https://world.openfoodfacts.org/>`_ からデータを取得し、*シンプル*で*直感的な* API を提供します。"
 
 #: ../../index.rst:9
-msgid ""
-"Check out the :doc:`usage` section for further information, including how"
-" to :ref:`installation` the project."
-msgstr ""
+msgid "Check out the :doc:`usage` section for further information, including how to :ref:`installation` the project."
+msgstr "プロジェクトの :ref:`インストール` 方法など、詳細については :doc:`使用方法` セクションを参照してください。"
 
 #: ../../index.rst:14
 msgid "This project is under active development."
-msgstr ""
+msgstr "このプロジェクトは活発に開発中です。"
 
 #: ../../index.rst:17
 msgid "Contents"
-msgstr ""
+msgstr "コンテンツ"
 

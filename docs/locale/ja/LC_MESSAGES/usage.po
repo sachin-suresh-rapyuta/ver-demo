@@ -19,34 +19,39 @@ msgstr ""
 
 #: ../../usage.rst:2
 msgid "Usage"
-msgstr ""
+msgstr "使い方"
 
 #: ../../usage.rst:7
 msgid "Installation"
-msgstr ""
+msgstr "インストール手順"
 
 #: ../../usage.rst:9
 msgid "To use Lumache, first install it using pip:"
-msgstr ""
+msgstr "Lumacheを使うには、まずpipでインストールします。"
 
 #: ../../usage.rst:16
 msgid "Creating recipes"
-msgstr ""
+msgstr "レシピの作成"
 
 #: ../../usage.rst:18
 msgid ""
-"To retrieve a list of random ingredients, you can use the "
-"``lumache.get_random_ingredients()`` function:"
+"To retrieve a list of random ingredients, you can use the ``lumache."
+"get_random_ingredients()`` function:"
 msgstr ""
+"ランダムな食材のリストを取得するには、 ``lumache."
+"get_random_ingredients()`` 関数を使用することができます。"
 
 #: ../../usage.rst:23
 msgid ""
-"The ``kind`` parameter should be either ``\"meat\"``, ``\"fish\"``, or "
-"``\"veggies\"``. Otherwise, :py:func:`lumache.get_random_ingredients` "
-"will raise an exception."
+"The ``kind`` parameter should be either ``\"meat\"``, ``\"fish\"``, or ``"
+"\"veggies\"``. Otherwise, :py:func:`lumache.get_random_ingredients` will "
+"raise an exception."
 msgstr ""
+"kind`` パラメータには ``\"meat\"``, ``\"fish\"``, または ``\"veggies\"`` "
+"のいずれかを指定してください。そうでない場合、 :py:func:`lumache."
+"get_random_ingredients` は例外を発生させます。"
 
 #: ../../usage.rst:29
 msgid "For example:"
-msgstr ""
+msgstr "例:"
 
