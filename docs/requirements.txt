@@ -1,2 +1,6 @@
 GitPython
 sphinxcontrib-redoc
+sphinx==5.1.1
+sphinxcontrib-plantuml==0.24
+sphinxcontrib-needs==0.7.8
+sphinx_simplepdf
