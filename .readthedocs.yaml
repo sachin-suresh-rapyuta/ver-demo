@@ -20,7 +20,7 @@ build:
     # golang: "1.17"
   jobs:
     post_build:
-      - cd docs && python -m sphinx -b simplepdf docs build/simplepdf/en/
+      - cd docs && python -m sphinx-build -a -E -b simplepdf docs build/simplepdf/en/
 
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
