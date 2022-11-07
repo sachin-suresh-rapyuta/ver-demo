@@ -20,7 +20,8 @@ build:
     # golang: "1.17"
   jobs:
     post_build:
-      - cd docs && python -m sphinx -a -E -b simplepdf docs build/simplepdf/en/
+      #- cd docs && python -m sphinx -a -E -b simplepdf docs build/simplepdf/en/
+      - /home/docs/checkouts/readthedocs.org/user_builds/${READTHEDOCS_PROJECT}/envs/${READTHEDOCS_VERSION}/bin/python -m sphinx -a -E -b simplepdf docs build/simplepdf/en/
 
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
